@@ -126,6 +126,14 @@ data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "${path.module}/function/"
   output_path = "${path.module}/lambda_function.zip"
+
+  # Exclure les fichiers qui font varier le hash inutilement
+  excludes = [
+    "__pycache__",
+    "*.pyc",
+    ".DS_Store",
+    "venv"
+  ]
 }
 
 resource "aws_cloudwatch_log_group" "start_stop_scheduler" {
@@ -142,7 +150,7 @@ resource "aws_lambda_function" "start_stop_scheduler" {
   handler       = "scheduler.main.lambda_handler"
   timeout       = var.lambda_timeout
 
-  source_code_hash = filebase64sha256(data.archive_file.lambda_zip.output_path)
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   runtime = "python3.14"
 

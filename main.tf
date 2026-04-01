@@ -164,6 +164,10 @@ resource "aws_lambda_function" "start_stop_scheduler" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    ignore_changes = [source_code_hash]
+  }
 }
 
 
